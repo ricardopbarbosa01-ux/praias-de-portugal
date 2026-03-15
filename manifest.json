@@ -23,5 +23,6 @@
     }
   ],
   "screenshots": [],
-  "categories": ["weather", "travel", "lifestyle"]
+  "categories": ["weather", "travel", "lifestyle"],
+  "version": "1.1.0"
 }
