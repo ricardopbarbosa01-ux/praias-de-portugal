@@ -15,7 +15,7 @@ const BEACHES = [
   { id: 'sao-pedro-moel', namePT: 'Praia de S. Pedro de Moel',       nameEN: 'Praia de S. Pedro de Moel',       town: 'Marinha Grande',  region: 'centro',         lat: 39.7500, lon: -9.0333, gh: 'gh-7', pop: 1, face: 270, photo: 'images/spedrodeamoel.jpg' },
   { id: 'nazare',         namePT: 'Praia da Nazar\u00e9',            nameEN: 'Praia da Nazar\u00e9',            town: 'Nazar\u00e9',     region: 'centro',         lat: 39.6012, lon: -9.0640, gh: 'gh-1', pop: 3, face: 270, surfSpot: true, windyCamUrl: 'https://embed.windy.com/embed2.html?lat=39.601&lon=-9.071&zoom=11&overlay=webcams', photo: 'images/nazare.jpg' },
   { id: 'peniche',        namePT: 'Praia de Peniche',                 nameEN: 'Praia de Peniche',                 town: 'Peniche',         region: 'centro',         lat: 39.3567, lon: -9.3833, gh: 'gh-2', pop: 3, face: 270, surfSpot: true, windyCamUrl: 'https://embed.windy.com/embed2.html?lat=39.356&lon=-9.381&zoom=11&overlay=webcams', photo: 'images/peniche.jpg' },
-  { id: 'costa-caparica', namePT: 'Praia da Costa de Caparica',      nameEN: 'Praia da Costa de Caparica',      town: 'Almada',          region: 'centro',         lat: 38.6333, lon: -9.2333, gh: 'gh-3', pop: 3, face: 270, cam: 'https://www.skylinewebcams.com/en/webcam/portugal/lisboa/almada/costa-da-caparica-fonte-da-telha-beach.html', photo: 'images/caparica.jpg' },
+  { id: 'costa-caparica', namePT: 'Praia da Costa de Caparica',      nameEN: 'Praia da Costa de Caparica',      town: 'Almada',          region: 'oeste',          lat: 38.6333, lon: -9.2333, gh: 'gh-3', pop: 3, face: 270, cam: 'https://www.skylinewebcams.com/en/webcam/portugal/lisboa/almada/costa-da-caparica-fonte-da-telha-beach.html', photo: 'images/caparica.jpg' },
   // ── Lisboa e Setúbal ──
   { id: 'cascais',        namePT: 'Praia de Cascais',                 nameEN: 'Praia de Cascais',                 town: 'Cascais',         region: 'lisboa-setubal', lat: 38.6979, lon: -9.4215, gh: 'gh-4', pop: 2, face: 225, windyCamUrl: 'https://embed.windy.com/embed2.html?lat=38.697&lon=-9.421&zoom=11&overlay=webcams', photo: 'images/cascais.jpg' },
   { id: 'sesimbra',       namePT: 'Praia de Sesimbra',                nameEN: 'Praia de Sesimbra',                town: 'Sesimbra',        region: 'lisboa-setubal', lat: 38.4437, lon: -9.1007, gh: 'gh-5', pop: 2, face: 180, cam: 'https://www.skylinewebcams.com/en/webcam/portugal/lisboa/sesimbra/sesimbra-meco-beach.html', photo: 'images/sesimbra.jpg' },
@@ -855,7 +855,7 @@ function cardHTML(beach, data, state) {
       <img class="card-photo" src="${beach.photo}" alt="${name}" loading="lazy"
            onerror="this.style.display='none'">
       <div class="card-photo-overlay"></div>
-      ${beach.cam ? `<div class="live-badge"><div class="live-dot"></div>LIVE</div>` : ''}
+      ${(beach.cam || beach.beachcam || beach.windyCamUrl) ? `<div class="live-badge"><div class="live-dot"></div>LIVE</div>` : ''}
       <div class="cam-btns">
         <button class="cam-btn cam-btn--windy" onclick="openWindy('${beach.id}')" title="${t.windyTitle}">&#127754; Windy</button>
         ${camBtnHTML(beach, t)}
