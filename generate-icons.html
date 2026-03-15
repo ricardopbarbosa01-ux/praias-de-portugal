@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head><title>Generate Icons</title></head>
+<body>
+<p>Click the buttons to download the icons, then place them in the project folder.</p>
+<canvas id="c192" width="192" height="192" style="border:1px solid #ccc;margin:8px"></canvas>
+<canvas id="c512" width="512" height="512" style="border:1px solid #ccc;margin:8px"><br>
+<button onclick="generate(192)">Download icon-192.png</button>
+<button onclick="generate(512)">Download icon-512.png</button>
+
+<script>
+function drawIcon(ctx, size) {
+  const s = size / 192; // scale factor
+  // Background gradient
+  const grad = ctx.createLinearGradient(0, 0, size, size);
+  grad.addColorStop(0, '#0a3d6b');
+  grad.addColorStop(1, '#1e88e5');
+  ctx.fillStyle = grad;
+  roundRect(ctx, 0, 0, size, size, size * 0.22);
+  ctx.fill();
+
+  // Sun
+  ctx.fillStyle = '#ff6f20';
+  ctx.beginPath();
+  ctx.arc(size * 0.68, size * 0.30, size * 0.13, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Waves
+  ctx.strokeStyle = 'rgba(255,255,255,0.9)';
+  ctx.lineWidth   = size * 0.045;
+  ctx.lineCap     = 'round';
+
+  const y1 = size * 0.58;
+  ctx.beginPath();
+  ctx.moveTo(size * 0.08, y1);
+  ctx.quadraticCurveTo(size * 0.23, y1 - size*0.10, size * 0.38, y1);
+  ctx.quadraticCurveTo(size * 0.53, y1 + size*0.10, size * 0.68, y1);
+  ctx.quadraticCurveTo(size * 0.83, y1 - size*0.10, size * 0.92, y1);
+  ctx.stroke();
+
+  const y2 = size * 0.72;
+  ctx.strokeStyle = 'rgba(255,255,255,0.55)';
+  ctx.lineWidth   = size * 0.035;
+  ctx.beginPath();
+  ctx.moveTo(size * 0.08, y2);
+  ctx.quadraticCurveTo(size * 0.23, y2 - size*0.08, size * 0.38, y2);
+  ctx.quadraticCurveTo(size * 0.53, y2 + size*0.08, size * 0.68, y2);
+  ctx.quadraticCurveTo(size * 0.83, y2 - size*0.08, size * 0.92, y2);
+  ctx.stroke();
+}
+
+function roundRect(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + w - r, y);
+  ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+  ctx.lineTo(x + w, y + h - r);
+  ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+  ctx.lineTo(x + r, y + h);
+  ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+  ctx.lineTo(x, y + r);
+  ctx.quadraticCurveTo(x, y, x + r, y);
+  ctx.closePath();
+}
+
+function generate(size) {
+  const id = 'c' + size;
+  const canvas = document.getElementById(id);
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0, 0, size, size);
+  drawIcon(ctx, size);
+  const a = document.createElement('a');
+  a.download = 'icon-' + size + '.png';
+  a.href = canvas.toDataURL('image/png');
+  a.click();
+}
+
+// Auto-draw previews
+['192','512'].forEach(s => {
+  const canvas = document.getElementById('c'+s);
+  const ctx = canvas.getContext('2d');
+  drawIcon(ctx, parseInt(s));
+});
+</script>
+</body>
+</html>

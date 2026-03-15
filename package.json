@@ -1,0 +1,15 @@
+{
+  "name": "praias-de-portugal",
+  "version": "1.0.0",
+  "description": "Condições das praias em tempo real para todo o Portugal continental",
+  "scripts": {
+    "build": "node build.js"
+  },
+  "devDependencies": {
+    "clean-css": "^5.3.3",
+    "terser": "^5.36.0"
+  },
+  "dependencies": {
+    "sharp": "^0.34.5"
+  }
+}

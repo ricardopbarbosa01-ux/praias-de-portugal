@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Praias de Portugal | Portugal Beaches</title>
+  <!-- PWA -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#0a3d6b">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Praias PT">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <meta name="description" content="Condições das praias em tempo real para todo o Portugal continental — temperatura, ondas, vento, UV e marés.">
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <header>
+    <div class="header-content">
+      <div class="logo">
+        <div class="logo-wave">
+          <svg viewBox="0 0 60 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M0 28 Q10 18 20 24 Q30 30 40 20 Q50 10 60 18 L60 40 L0 40Z" fill="rgba(255,255,255,0.15)"/>
+            <path d="M0 32 Q12 22 24 28 Q36 34 48 24 Q54 19 60 22 L60 40 L0 40Z" fill="rgba(255,255,255,0.25)"/>
+          </svg>
+        </div>
+        <div class="logo-text">
+          <h1 id="site-title">Praias de Portugal</h1>
+          <p id="site-subtitle">Condições em tempo real</p>
+        </div>
+      </div>
+      <button id="lang-toggle" class="lang-btn" onclick="toggleLanguage()">EN</button>
+    </div>
+  </header>
+
+  <main>
+    <!-- Top bar -->
+    <div class="top-bar">
+      <span id="beach-counter" class="beach-counter"></span>
+      <div class="top-bar-right">
+        <span id="last-updated" class="last-updated-text"></span>
+        <button class="refresh-btn" onclick="loadAllBeaches()" id="refresh-btn" title="Atualizar / Refresh">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M23 4v6h-6"/><path d="M1 20v-6h6"/>
+            <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- View toggle: Cards / Map / Cameras -->
+    <div class="view-toggle">
+      <button id="btn-cards"   class="view-btn active" onclick="setView('cards')">&#10868; Cards</button>
+      <button id="btn-map"     class="view-btn"        onclick="setView('map')">&#128506; Mapa</button>
+      <button id="btn-cameras" class="view-btn"        onclick="setView('cameras')">&#128247; <span id="cameras-btn-text">Câmeras</span></button>
+    </div>
+
+    <!-- Region filter (cards view only) -->
+    <div id="region-filter" class="region-filter" role="navigation" aria-label="Filtro por região"></div>
+
+    <!-- Leaflet map (map view only) -->
+    <div id="map-container" style="display:none">
+      <div id="map"></div>
+    </div>
+
+    <!-- Cameras grid -->
+    <div id="cameras-grid" class="cameras-grid" style="display:none"></div>
+
+    <!-- Beach cards grid -->
+    <div id="beaches-grid" class="beaches-grid"></div>
+
+    <p class="disclaimer" id="disclaimer">* Lotação estimada · Marés aproximadas (modelo simplificado)</p>
+  </main>
+
+  <footer>
+    <div class="footer-content">
+      <p id="footer-data">Dados meteorológicos: <a href="https://open-meteo.com" target="_blank" rel="noopener">Open-Meteo API</a></p>
+      <p id="footer-note">Lotação e marés são estimativas e podem não refletir condições reais</p>
+      <p class="footer-author">Desenvolvido por <strong>RBarbosa Dev</strong></p>
+    </div>
+  </footer>
+
+  <!-- LiveCam Modal -->
+  <div id="cam-modal" class="cam-modal" role="dialog" aria-modal="true" aria-label="LiveCam" onclick="closeCam()">
+    <div class="cam-modal-inner" onclick="event.stopPropagation()">
+      <div class="cam-modal-header">
+        <span class="cam-live-badge">
+          <span class="cam-live-dot"></span>
+          <span id="cam-live-text">AO VIVO</span>
+        </span>
+        <span id="cam-modal-title" class="cam-modal-title"></span>
+        <button class="cam-close-btn" onclick="closeCam()" aria-label="Fechar">&times;</button>
+      </div>
+      <div class="cam-modal-body">
+        <div id="cam-loading" class="cam-loading">
+          <div class="cam-spinner"></div>
+        </div>
+        <div id="cam-error" class="cam-error" style="display:none">
+          <p id="cam-error-msg">Câmera temporariamente indisponível</p>
+          <a id="cam-open-link" href="#" target="_blank" rel="noopener">Abrir diretamente no browser</a>
+        </div>
+        <iframe id="cam-iframe" class="cam-iframe" src="" frameborder="0" allowfullscreen allow="autoplay"></iframe>
+      </div>
+    </div>
+  </div>
+
+  <!-- Info Modal -->
+  <div id="info-modal" class="info-modal" role="dialog" aria-modal="true" onclick="closeInfo()">
+    <div class="info-modal-inner" onclick="event.stopPropagation()">
+      <div class="info-modal-header">
+        <span id="info-modal-title" class="info-modal-title"></span>
+        <button class="info-close-btn" onclick="closeInfo()" aria-label="Fechar">&times;</button>
+      </div>
+      <div id="info-modal-body" class="info-modal-body"></div>
+    </div>
+  </div>
+
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
