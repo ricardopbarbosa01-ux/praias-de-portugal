@@ -917,3 +917,80 @@ footer a:hover { text-decoration: underline; }
   transition: background 0.2s, color 0.2s;
 }
 .info-pill-btn:hover { background: var(--blue-deep); color: #fff; border-color: var(--blue-deep); }
+
+/* ===== Search Bar ===== */
+.search-bar {
+  position: relative;
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+.search-icon {
+  position: absolute;
+  left: 0.9rem;
+  font-size: 1rem;
+  pointer-events: none;
+  opacity: 0.55;
+  z-index: 1;
+}
+.search-input {
+  width: 100%;
+  padding: 0.65rem 2.8rem 0.65rem 2.6rem;
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.88rem;
+  color: var(--text);
+  background: #fff;
+  border: 1.5px solid var(--border);
+  border-radius: 50px;
+  outline: none;
+  box-shadow: 0 2px 8px rgba(10,61,107,0.06);
+  transition: border-color 0.2s, box-shadow 0.2s;
+  -webkit-appearance: none;
+}
+.search-input:focus {
+  border-color: var(--blue-light);
+  box-shadow: 0 0 0 3px rgba(30,136,229,0.13);
+}
+.search-input::placeholder { color: #aab4c8; }
+/* hide native clear button on search inputs */
+.search-input::-webkit-search-cancel-button { display: none; }
+
+.search-clear {
+  position: absolute;
+  right: 0.75rem;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  cursor: pointer;
+  padding: 0.3rem 0.4rem;
+  line-height: 1;
+  border-radius: 50%;
+  transition: background 0.2s, color 0.2s;
+}
+.search-clear:hover { background: var(--bg); color: var(--text); }
+
+/* ===== Nearby button highlight ===== */
+.nearby-btn { border-color: var(--orange) !important; }
+.nearby-btn.active {
+  background: var(--orange) !important;
+  border-color: var(--orange) !important;
+  box-shadow: 0 3px 14px rgba(255,111,32,0.35) !important;
+}
+
+/* ===== No Results ===== */
+.no-results {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 3rem 1rem;
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+.no-results::before {
+  content: '🔍';
+  display: block;
+  font-size: 2.5rem;
+  margin-bottom: 0.75rem;
+  opacity: 0.5;
+}

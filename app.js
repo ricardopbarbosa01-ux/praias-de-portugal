@@ -302,6 +302,12 @@ const T = {
     infoYes:        'Sim',
     infoNo:         'Não',
     infoSeasonal:   'Sazonal',
+    nearMeBtn:       'Perto de mim',
+    viewAll:         'Ver todas',
+    noLocation:      'Localização não disponível',
+    searchPlaceholder: 'Pesquisar praia ou região...',
+    noResults:       'Nenhuma praia encontrada',
+    searchActive:    'pesquisa',
   },
   EN: {
     siteTitle:    'Portugal Beaches',
@@ -370,18 +376,28 @@ const T = {
     infoYes:        'Yes',
     infoNo:         'No',
     infoSeasonal:   'Seasonal',
+    nearMeBtn:       'Near me',
+    viewAll:         'View all',
+    noLocation:      'Location unavailable',
+    searchPlaceholder: 'Search beach or region...',
+    noResults:       'No beaches found',
+    searchActive:    'search',
   },
 };
 
 /* ===== State ===== */
-let lang           = 'PT';
-let activeRegion   = 'all';
-let currentView    = 'cards';
-let cache          = {};
-let nearestBeachId = null;
-let leafletMap     = null;
-let mapMarkers     = {};
-let camTimer       = null;
+let lang            = 'PT';
+let activeRegion    = 'all';
+let currentView     = 'cards';
+let cache           = {};
+let nearestBeachId  = null;
+let leafletMap      = null;
+let mapMarkers      = {};
+let camTimer        = null;
+let nearbyMode      = false;
+let nearbyDistances = {};   // beach.id → km (integer)
+let nearbyTop10     = [];   // sorted top-10 beach IDs
+let searchQuery     = '';
 
 /* =====================================================================
    LANGUAGE
@@ -410,6 +426,10 @@ function applyLangTexts() {
   if (cache._updatedAt) {
     document.getElementById('last-updated').textContent = `${t.updatedAt} ${cache._updatedAt}`;
   }
+  const si = document.getElementById('search-input');
+  if (si) si.placeholder = t.searchPlaceholder;
+  const nr = document.getElementById('no-results');
+  if (nr) nr.textContent = t.noResults;
   renderRegionFilter();
   updateCounter();
 }
@@ -424,6 +444,7 @@ function setView(view) {
   const isCams  = view === 'cameras';
   document.getElementById('beaches-grid').style.display   = isCards ? '' : 'none';
   document.getElementById('region-filter').style.display  = isCards ? '' : 'none';
+  document.getElementById('search-bar').style.display     = isCards ? '' : 'none';
   document.getElementById('disclaimer').style.display     = isCards ? '' : 'none';
   document.getElementById('map-container').style.display  = isMap   ? '' : 'none';
   document.getElementById('cameras-grid').style.display   = isCams  ? '' : 'none';
@@ -511,12 +532,28 @@ function surfRatingColor(r) {
    ===================================================================== */
 function renderRegionFilter() {
   const labels = REGION_LABELS[lang];
-  document.getElementById('region-filter').innerHTML = REGION_KEYS.map(rk => `
-    <button class="region-btn${activeRegion === rk ? ' active' : ''}" onclick="setRegion('${rk}')">${labels[rk]}</button>
+  const t      = T[lang];
+  const regionBtns = REGION_KEYS.map(rk => `
+    <button class="region-btn${activeRegion === rk && !nearbyMode ? ' active' : ''}" onclick="setRegion('${rk}')">${labels[rk]}</button>
   `).join('');
+  const nearbyBtnLabel = nearbyMode
+    ? `\uD83D\uDCCD ${t.nearMeBtn} &middot; ${t.viewAll}`
+    : `\uD83D\uDCCD ${t.nearMeBtn}`;
+  const nearbyBtn = `<button class="region-btn nearby-btn${nearbyMode ? ' active' : ''}" id="nearby-btn" onclick="${nearbyMode ? 'deactivateNearby()' : 'activateNearby()'}">` + nearbyBtnLabel + `</button>`;
+  document.getElementById('region-filter').innerHTML = regionBtns + nearbyBtn;
 }
 
 function setRegion(region) {
+  if (nearbyMode) {
+    nearbyMode = false;
+    nearbyDistances = {};
+    nearbyTop10 = [];
+    restoreGridOrder();
+  }
+  searchQuery = '';
+  const si = document.getElementById('search-input');
+  if (si) { si.value = ''; }
+  document.getElementById('search-clear').style.display = 'none';
   activeRegion = region;
   renderRegionFilter();
   applyFilter(true);
@@ -524,14 +561,26 @@ function setRegion(region) {
 }
 
 function shouldShowCard(beach) {
+  if (searchQuery) {
+    const q  = searchQuery;
+    const rPT = (REGION_LABELS.PT[beach.region] || '').toLowerCase();
+    const rEN = (REGION_LABELS.EN[beach.region] || '').toLowerCase();
+    return beach.namePT.toLowerCase().includes(q) ||
+           beach.nameEN.toLowerCase().includes(q) ||
+           beach.town.toLowerCase().includes(q)   ||
+           rPT.includes(q) || rEN.includes(q);
+  }
+  if (nearbyMode) return nearbyTop10.includes(beach.id);
   return activeRegion === 'all' || beach.region === activeRegion || beach.id === nearestBeachId;
 }
 
 function applyFilter(animate) {
+  let visible = 0;
   BEACHES.forEach(beach => {
     const el = document.getElementById('card-' + beach.id);
     if (!el) return;
     if (shouldShowCard(beach)) {
+      visible++;
       el.style.display = '';
       requestAnimationFrame(() => el.classList.remove('is-hiding'));
     } else {
@@ -543,20 +592,29 @@ function applyFilter(animate) {
       }
     }
   });
+  const nr = document.getElementById('no-results');
+  if (nr) nr.style.display = (visible === 0 && searchQuery) ? '' : 'none';
 }
 
 function updateCounter() {
   const t      = T[lang];
   const labels = REGION_LABELS[lang];
-  let visible;
-  if (activeRegion === 'all') {
-    visible = BEACHES.length;
+  let visible, regionLabel;
+  if (searchQuery) {
+    visible     = BEACHES.filter(b => shouldShowCard(b)).length;
+    regionLabel = t.searchActive;
+  } else if (nearbyMode) {
+    visible     = nearbyTop10.length;
+    regionLabel = t.nearMeBtn;
+  } else if (activeRegion === 'all') {
+    visible     = BEACHES.length;
+    regionLabel = t.allRegions;
   } else {
     const inRegion   = BEACHES.filter(b => b.region === activeRegion).length;
     const nearestExt = nearestBeachId && BEACHES.find(b => b.id === nearestBeachId && b.region !== activeRegion);
-    visible = inRegion + (nearestExt ? 1 : 0);
+    visible     = inRegion + (nearestExt ? 1 : 0);
+    regionLabel = labels[activeRegion];
   }
-  const regionLabel = activeRegion === 'all' ? t.allRegions : labels[activeRegion];
   document.getElementById('beach-counter').textContent = `${visible} ${t.beachesWord} \u00B7 ${regionLabel}`;
 }
 
@@ -849,6 +907,7 @@ function cardHTML(beach, data, state) {
   const locParts = [beach.town];
   if (isNearest)    locParts.push(`\uD83D\uDCCD ${t.nearest}`);
   if (beach.surfSpot) locParts.push(`\uD83C\uDFC4 ${t.surfSpot}`);
+  if (nearbyMode && nearbyDistances[beach.id] != null) locParts.push(`${nearbyDistances[beach.id]} km`);
 
   const photo = `
     <div class="card-photo-wrapper">
@@ -1219,6 +1278,107 @@ function buildInfoHTML(info, t) {
 }
 
 /* =====================================================================
+   NEARBY MODE
+   ===================================================================== */
+function activateNearby() {
+  const btn = document.getElementById('nearby-btn');
+  if (btn) btn.textContent = '\u231B\uFE0F\u2026';
+
+  if (!navigator.geolocation) { _showGeoError(); return; }
+
+  navigator.geolocation.getCurrentPosition(pos => {
+    const { latitude: lat, longitude: lon } = pos.coords;
+
+    BEACHES.forEach(b => {
+      nearbyDistances[b.id] = Math.round(haversine(lat, lon, b.lat, b.lon));
+    });
+
+    nearbyTop10 = BEACHES.slice()
+      .sort((a, b) => nearbyDistances[a.id] - nearbyDistances[b.id])
+      .slice(0, 10)
+      .map(b => b.id);
+
+    nearbyMode   = true;
+    activeRegion = 'all';
+    searchQuery  = '';
+    const si = document.getElementById('search-input');
+    if (si) si.value = '';
+    document.getElementById('search-clear').style.display = 'none';
+
+    rerenderAllCards();       // refresh distance badges
+    renderRegionFilter();
+    applyFilter(true);
+    sortGridByDistance();
+    updateCounter();
+  }, _showGeoError);
+}
+
+function deactivateNearby() {
+  nearbyMode      = false;
+  nearbyDistances = {};
+  nearbyTop10     = [];
+  rerenderAllCards();         // remove distance badges
+  restoreGridOrder();
+  renderRegionFilter();
+  applyFilter(true);
+  updateCounter();
+}
+
+function sortGridByDistance() {
+  const grid = document.getElementById('beaches-grid');
+  nearbyTop10.forEach(id => {
+    const card = document.getElementById('card-' + id);
+    if (card) grid.appendChild(card);
+  });
+}
+
+function restoreGridOrder() {
+  const grid = document.getElementById('beaches-grid');
+  BEACHES.forEach(b => {
+    const card = document.getElementById('card-' + b.id);
+    if (card) grid.appendChild(card);
+  });
+}
+
+function _showGeoError() {
+  nearbyMode = false;
+  renderRegionFilter();
+  const t   = T[lang];
+  const btn = document.getElementById('nearby-btn');
+  if (btn) {
+    btn.textContent = t.noLocation;
+    btn.classList.remove('active');
+    setTimeout(() => renderRegionFilter(), 3000);
+  }
+}
+
+/* =====================================================================
+   SEARCH
+   ===================================================================== */
+function handleSearch(value) {
+  searchQuery = value.trim().toLowerCase();
+  document.getElementById('search-clear').style.display = searchQuery ? '' : 'none';
+
+  if (nearbyMode) {
+    nearbyMode      = false;
+    nearbyDistances = {};
+    nearbyTop10     = [];
+    restoreGridOrder();
+    rerenderAllCards();
+    renderRegionFilter();
+  }
+
+  applyFilter(false);
+  updateCounter();
+}
+
+function clearSearch() {
+  const si = document.getElementById('search-input');
+  if (si) { si.value = ''; si.focus(); }
+  handleSearch('');
+}
+
+/* =====================================================================
    LOAD ALL BEACHES
    ===================================================================== */
 
@@ -1260,7 +1420,15 @@ document.addEventListener('DOMContentLoaded', () => {
   tryGeolocation();
   setInterval(loadAllBeaches, 30 * 60 * 1000);
   registerSW();
-  document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeCam(); closeInfo(); } });
+
+  const searchInput = document.getElementById('search-input');
+  if (searchInput) {
+    searchInput.addEventListener('input', e => handleSearch(e.target.value));
+  }
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') { closeCam(); closeInfo(); clearSearch(); }
+  });
 });
 
 /* =====================================================================

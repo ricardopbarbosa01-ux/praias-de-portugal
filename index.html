@@ -61,6 +61,14 @@
       <button id="btn-cameras" class="view-btn"        onclick="setView('cameras')">&#128247; <span id="cameras-btn-text">Câmeras</span></button>
     </div>
 
+    <!-- Search bar (cards view only) -->
+    <div id="search-bar" class="search-bar">
+      <span class="search-icon">&#128269;</span>
+      <input id="search-input" class="search-input" type="search" autocomplete="off"
+             placeholder="Pesquisar praia ou região..." aria-label="Pesquisar praia">
+      <button id="search-clear" class="search-clear" onclick="clearSearch()" aria-label="Limpar pesquisa" style="display:none">&#10005;</button>
+    </div>
+
     <!-- Region filter (cards view only) -->
     <div id="region-filter" class="region-filter" role="navigation" aria-label="Filtro por região"></div>
 
@@ -74,6 +82,7 @@
 
     <!-- Beach cards grid -->
     <div id="beaches-grid" class="beaches-grid"></div>
+    <div id="no-results" class="no-results" style="display:none"></div>
 
     <p class="disclaimer" id="disclaimer">* Lotação estimada · Marés aproximadas (modelo simplificado)</p>
   </main>
