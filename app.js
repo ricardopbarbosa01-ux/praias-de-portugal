@@ -1094,12 +1094,18 @@ function windyUrl(beach) {
 
 /* Helper: returns HTML for the 📷 camera button */
 function camBtnHTML(beach, t) {
-  // Qualquer câmera → abre modal interno na app
-  if (beach.cam || beach.beachcam || beach.windyCamUrl) {
+  // Beachcam ou cam → abre em nova tab (beachcam.pt bloqueia iframes)
+  if (beach.beachcam || beach.cam) {
+    const url = beach.beachcam || beach.cam;
+    return `<a class="cam-btn cam-btn--camera" href="${url}" target="_blank" rel="noopener noreferrer" title="${t.camTitle}">&#128247; ${t.camBtn2}</a>`;
+  }
+  // Windy webcam → modal interno (permite iframe)
+  if (beach.windyCamUrl) {
     return `<button class="cam-btn cam-btn--camera" onclick="openCamera('${beach.id}')" title="${t.camTitle}">&#128247; ${t.camBtn2}</button>`;
   }
   // Sem câmera → desativado
   return `<button class="cam-btn cam-btn--disabled" disabled title="${t.camUnavailable}">&#128247; ${t.camBtn2}</button>`;
+}
 }
 
 /* Generic modal opener used by openWindy + openCamera */
