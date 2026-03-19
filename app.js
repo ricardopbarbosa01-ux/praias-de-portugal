@@ -253,7 +253,7 @@ const T = {
     allRegions:   'todas as regiões',
     nearest:      'Mais próxima',
     viewCards:    'Cards',
-    viewMap:      'Mapa',
+    viewMap:      'Mapa', 
     surfSpot:     'Surf Spot',
     surfLabels:   { 1: 'Sem condições', 2: 'Fraco', 3: 'Razoável', 4: 'Bom', 5: 'Épico' },
     uvLabel:      'UV',
