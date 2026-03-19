@@ -234,6 +234,40 @@ const REGION_LABELS = {
 };
 
 /* ===== i18n ===== */
+/* ===== PT → EN value translation map ===== */
+const PT_TO_EN = {
+  // Surf levels
+  'Iniciante': 'Beginner', 'Intermediário': 'Intermediate', 'Avançado': 'Advanced',
+  'Profissional': 'Professional', 'Não recomendado': 'Not recommended',
+  'Iniciante-Intermediário': 'Beginner-Intermediate',
+  // Seabed
+  'Areia': 'Sand', 'Pedra': 'Rocks', 'Areia+Pedra': 'Sand & Rocks',
+  'Pedra+Recife': 'Rocks & Reef', 'Areia+Recife': 'Sand & Reef', 'Pedra+Areia': 'Rocks & Sand',
+  // Risk
+  'Baixo': 'Low', 'Médio': 'Medium', 'Alto': 'High',
+  // Lifeguard season
+  'Jun-Set': 'Jun-Sep', 'Jul-Set': 'Jul-Sep', 'Todo o ano': 'Year-round', 'Não tem': 'None',
+  // Crowd
+  'Tranquila': 'Quiet', 'Moderada': 'Moderate', 'Cheia': 'Busy',
+  'Muito frequentada': 'Very busy', 'Superlotada verão': 'Packed in summer',
+  'Moderada-Alta verão': 'Moderate-High in summer', 'Muito frequentada verão': 'Very busy in summer',
+  // Parking
+  'Gratuito': 'Free', 'Pago': 'Paid', 'Limitado': 'Limited',
+  'Gratuito/Limitado': 'Free/Limited', 'Gratuito/Difícil': 'Free/Difficult',
+  'Difícil': 'Difficult', 'N/A (ferryboat)': 'N/A (ferry)', 'Gratuito/Pago': 'Free/Paid',
+  // Fishing type
+  'Rocha': 'Rock', 'Embarcada': 'Boat', 'Surf casting': 'Surf casting',
+  'Rocha+Embarcada': 'Rock & Boat', 'Rocha+Surf casting': 'Rock & Surf casting',
+  'Surf casting+Embarcada': 'Surf casting & Boat',
+  'Surf casting+Rocha+Embarcada': 'Surf casting, Rock & Boat',
+  'Surf casting+Rocha': 'Surf casting & Rock', 'Milfontes surf': 'Milfontes surf',
+  // Fishing season
+  'Verão': 'Summer', 'Primavera-Verão': 'Spring-Summer',
+  'Primavera-Outono': 'Spring-Autumn', 'Outono-Inverno': 'Autumn-Winter', 'Set-Nov': 'Sep-Nov',
+};
+
+function tr(v) { return lang === 'EN' ? (PT_TO_EN[v] || v) : v; }
+
 const T = {
   PT: {
     siteTitle:    'Praias de Portugal',
@@ -431,6 +465,7 @@ function applyLangTexts() {
   const nr = document.getElementById('no-results');
   if (nr) nr.textContent = t.noResults;
   renderRegionFilter();
+  renderNearbyBtn();
   updateCounter();
 }
 
@@ -532,15 +567,24 @@ function surfRatingColor(r) {
    ===================================================================== */
 function renderRegionFilter() {
   const labels = REGION_LABELS[lang];
-  const t      = T[lang];
   const regionBtns = REGION_KEYS.map(rk => `
     <button class="region-btn${activeRegion === rk && !nearbyMode ? ' active' : ''}" onclick="setRegion('${rk}')">${labels[rk]}</button>
   `).join('');
-  const nearbyBtnLabel = nearbyMode
-    ? `\uD83D\uDCCD ${t.nearMeBtn} &middot; ${t.viewAll}`
-    : `\uD83D\uDCCD ${t.nearMeBtn}`;
-  const nearbyBtn = `<button class="region-btn nearby-btn${nearbyMode ? ' active' : ''}" id="nearby-btn" onclick="${nearbyMode ? 'deactivateNearby()' : 'activateNearby()'}">` + nearbyBtnLabel + `</button>`;
-  document.getElementById('region-filter').innerHTML = regionBtns + nearbyBtn;
+  document.getElementById('region-filter').innerHTML = regionBtns;
+}
+
+function renderNearbyBtn() {
+  const t   = T[lang];
+  const btn = document.getElementById('nearby-btn');
+  if (!btn) return;
+  const span = document.getElementById('nearby-btn-text');
+  if (span) span.textContent = t.nearMeBtn;
+  btn.classList.toggle('active', nearbyMode);
+}
+
+function toggleNearby() {
+  if (nearbyMode) deactivateNearby();
+  else activateNearby();
 }
 
 function setRegion(region) {
@@ -1059,10 +1103,10 @@ function cardHTML(beach, data, state) {
         </div>
         <div id="fish-body-${beach.id}" class="fish-body" style="display:none">
           <div class="fish-grid">
-            <div class="fish-item fish-item--full"><span class="fish-lbl">${t.fishingType}</span><span class="fish-val">${FISHING[beach.id].tipo}</span></div>
+            <div class="fish-item fish-item--full"><span class="fish-lbl">${t.fishingType}</span><span class="fish-val">${tr(FISHING[beach.id].tipo)}</span></div>
             <div class="fish-item fish-item--full"><span class="fish-lbl">${t.fishingSpecies}</span><span class="fish-val">${FISHING[beach.id].especies}</span></div>
-            <div class="fish-item"><span class="fish-lbl">${t.fishingSeason}</span><span class="fish-val">${FISHING[beach.id].epoca}</span></div>
-            <div class="fish-item"><span class="fish-lbl">${t.fishingLevel}</span><span class="fish-val fish-level-${FISHING[beach.id].nivel}">${FISHING[beach.id].nivel}</span></div>
+            <div class="fish-item"><span class="fish-lbl">${t.fishingSeason}</span><span class="fish-val">${tr(FISHING[beach.id].epoca)}</span></div>
+            <div class="fish-item"><span class="fish-lbl">${t.fishingLevel}</span><span class="fish-val fish-level-${FISHING[beach.id].nivel}">${tr(FISHING[beach.id].nivel)}</span></div>
           </div>
         </div>
       </div>` : ''}
@@ -1243,27 +1287,27 @@ function buildInfoHTML(info, t) {
     <div class="info-section">
       <div class="info-section-title">${t.infoSurf}</div>
       <div class="info-grid">
-        <div class="info-item"><span class="info-lbl">${t.infoSurfLevel}</span><span class="info-val">${info.surfLevel}</span></div>
-        <div class="info-item"><span class="info-lbl">${t.infoSeabed}</span><span class="info-val">${info.fundo}</span></div>
+        <div class="info-item"><span class="info-lbl">${t.infoSurfLevel}</span><span class="info-val">${tr(info.surfLevel)}</span></div>
+        <div class="info-item"><span class="info-lbl">${t.infoSeabed}</span><span class="info-val">${tr(info.fundo)}</span></div>
       </div>
     </div>
     <div class="info-section">
       <div class="info-section-title">${t.infoSafety}</div>
       <div class="info-grid">
-        <div class="info-item"><span class="info-lbl">${t.infoRisk}</span><span class="info-val" style="color:${riskColor}">${info.risco}</span></div>
-        <div class="info-item"><span class="info-lbl">${t.infoLifeguard}</span><span class="info-val">${info.nadador}</span></div>
+        <div class="info-item"><span class="info-lbl">${t.infoRisk}</span><span class="info-val" style="color:${riskColor}">${tr(info.risco)}</span></div>
+        <div class="info-item"><span class="info-lbl">${t.infoLifeguard}</span><span class="info-val">${tr(info.nadador)}</span></div>
       </div>
     </div>
     <div class="info-section">
       <div class="info-section-title">${t.infoCrowd}</div>
       <div class="info-grid">
-        <div class="info-item info-item--full"><span class="info-lbl">${t.infoCrowdLevel}</span><span class="info-val">${info.afluencia}</span></div>
+        <div class="info-item info-item--full"><span class="info-lbl">${t.infoCrowdLevel}</span><span class="info-val">${tr(info.afluencia)}</span></div>
       </div>
     </div>
     <div class="info-section">
       <div class="info-section-title">${t.infoAccess}</div>
       <div class="info-grid">
-        <div class="info-item info-item--full"><span class="info-lbl">${t.infoParking}</span><span class="info-val">${info.parking}</span></div>
+        <div class="info-item info-item--full"><span class="info-lbl">${t.infoParking}</span><span class="info-val">${tr(info.parking)}</span></div>
       </div>
     </div>
     <div class="info-section">
@@ -1282,7 +1326,7 @@ function buildInfoHTML(info, t) {
    ===================================================================== */
 function activateNearby() {
   const btn = document.getElementById('nearby-btn');
-  if (btn) btn.textContent = '\u231B\uFE0F\u2026';
+  if (btn) btn.innerHTML = '\u231B\uFE0F\u2026';
 
   if (!navigator.geolocation) { _showGeoError(); return; }
 
@@ -1307,6 +1351,7 @@ function activateNearby() {
 
     rerenderAllCards();       // refresh distance badges
     renderRegionFilter();
+    renderNearbyBtn();
     applyFilter(true);
     sortGridByDistance();
     updateCounter();
@@ -1320,6 +1365,7 @@ function deactivateNearby() {
   rerenderAllCards();         // remove distance badges
   restoreGridOrder();
   renderRegionFilter();
+  renderNearbyBtn();
   applyFilter(true);
   updateCounter();
 }
@@ -1343,12 +1389,13 @@ function restoreGridOrder() {
 function _showGeoError() {
   nearbyMode = false;
   renderRegionFilter();
+  renderNearbyBtn();
   const t   = T[lang];
   const btn = document.getElementById('nearby-btn');
   if (btn) {
-    btn.textContent = t.noLocation;
+    btn.innerHTML = `\u26A0\uFE0F ${t.noLocation}`;
     btn.classList.remove('active');
-    setTimeout(() => renderRegionFilter(), 3000);
+    setTimeout(() => renderNearbyBtn(), 3000);
   }
 }
 
