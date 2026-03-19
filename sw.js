@@ -2,8 +2,8 @@
    Praias de Portugal — Service Worker
    =================================================================== */
 
-const CACHE_NAME   = 'praias-pt-v23';
-const STATIC_CACHE = 'praias-static-v23';
+const CACHE_NAME   = 'praias-pt-v25';
+const STATIC_CACHE = 'praias-static-v25';
 
 const STATIC_ASSETS = [
   '/',
