@@ -15,10 +15,10 @@ const BEACHES = [
   { id: 'sao-pedro-moel', namePT: 'Praia de S. Pedro de Moel',       nameEN: 'Praia de S. Pedro de Moel',       town: 'Marinha Grande',  region: 'centro',         lat: 39.7500, lon: -9.0333, gh: 'gh-7', pop: 1, face: 270, photo: 'images/spedrodeamoel.jpg' },
   { id: 'nazare',         namePT: 'Praia da Nazar\u00e9',            nameEN: 'Praia da Nazar\u00e9',            town: 'Nazar\u00e9',     region: 'centro',         lat: 39.6012, lon: -9.0640, gh: 'gh-1', pop: 3, face: 270, surfSpot: true, windyCamUrl: 'https://embed.windy.com/embed2.html?lat=39.601&lon=-9.071&zoom=11&overlay=webcams', photo: 'images/nazare.jpg' },
   { id: 'peniche',        namePT: 'Praia de Peniche',                 nameEN: 'Praia de Peniche',                 town: 'Peniche',         region: 'centro',         lat: 39.3567, lon: -9.3833, gh: 'gh-2', pop: 3, face: 270, surfSpot: true, windyCamUrl: 'https://embed.windy.com/embed2.html?lat=39.356&lon=-9.381&zoom=11&overlay=webcams', photo: 'images/peniche.jpg' },
-  { id: 'costa-caparica', namePT: 'Praia da Costa de Caparica',      nameEN: 'Praia da Costa de Caparica',      town: 'Almada',          region: 'oeste',          lat: 38.6333, lon: -9.2333, gh: 'gh-3', pop: 3, face: 270, cam: 'https://www.skylinewebcams.com/en/webcam/portugal/lisboa/almada/costa-da-caparica-fonte-da-telha-beach.html', photo: 'images/caparica.jpg' },
+  { id: 'costa-caparica', namePT: 'Praia da Costa de Caparica',      nameEN: 'Praia da Costa de Caparica',      town: 'Almada',          region: 'oeste',          lat: 38.6333, lon: -9.2333, gh: 'gh-3', pop: 3, face: 270, beachcam: 'https://www.beachcam.pt/livecams/costa-da-caparica/', photo: 'images/caparica.jpg' },
   // ── Lisboa e Setúbal ──
   { id: 'cascais',        namePT: 'Praia de Cascais',                 nameEN: 'Praia de Cascais',                 town: 'Cascais',         region: 'lisboa-setubal', lat: 38.6979, lon: -9.4215, gh: 'gh-4', pop: 2, face: 225, windyCamUrl: 'https://embed.windy.com/embed2.html?lat=38.697&lon=-9.421&zoom=11&overlay=webcams', photo: 'images/cascais.jpg' },
-  { id: 'sesimbra',       namePT: 'Praia de Sesimbra',                nameEN: 'Praia de Sesimbra',                town: 'Sesimbra',        region: 'lisboa-setubal', lat: 38.4437, lon: -9.1007, gh: 'gh-5', pop: 2, face: 180, cam: 'https://www.skylinewebcams.com/en/webcam/portugal/lisboa/sesimbra/sesimbra-meco-beach.html', photo: 'images/sesimbra.jpg' },
+  { id: 'sesimbra',       namePT: 'Praia de Sesimbra',                nameEN: 'Praia de Sesimbra',                town: 'Sesimbra',        region: 'lisboa-setubal', lat: 38.4437, lon: -9.1007, gh: 'gh-5', pop: 2, face: 180, beachcam: 'https://www.beachcam.pt/livecams/sesimbra/', photo: 'images/sesimbra.jpg' },
   { id: 'setubal',        namePT: 'Praia de Set\u00fabal',           nameEN: 'Praia de Set\u00fabal',           town: 'Set\u00fabal',    region: 'lisboa-setubal', lat: 38.5244, lon: -8.8882, gh: 'gh-6', pop: 1, face: 225, photo: 'images/setubal.jpg' },
   { id: 'comporta',       namePT: 'Praia da Comporta',                nameEN: 'Praia da Comporta',                town: 'Alc\u00e1cer do Sal', region: 'lisboa-setubal', lat: 38.3833, lon: -8.7667, gh: 'gh-7', pop: 2, face: 270, photo: 'images/comporta.jpg' },
   // ── Alentejo Litoral ──
@@ -27,8 +27,8 @@ const BEACHES = [
   { id: 'almograve',      namePT: 'Praia do Almograve',               nameEN: 'Praia do Almograve',               town: 'Odemira',         region: 'alentejo',       lat: 37.6500, lon: -8.8000, gh: 'gh-3', pop: 1, face: 270, photo: 'images/almograve.jpg' },
   { id: 'odeceixe',       namePT: 'Praia de Odeceixe',                nameEN: 'Praia de Odeceixe',                town: 'Aljezur',         region: 'alentejo',       lat: 37.4333, lon: -8.7833, gh: 'gh-4', pop: 2, face: 270, photo: 'images/odeceixe.jpg' },
   // ── Algarve ──
-  { id: 'meia-praia',         namePT: 'Meia Praia',         nameEN: 'Meia Praia',         town: 'Lagos',     region: 'algarve', lat: 37.1167, lon: -8.6833, gh: 'gh-5', pop: 1, face: 180, cam: 'https://www.skylinewebcams.com/en/webcam/portugal/algarve/lagos/lagos-portugal.html', photo: 'images/meiapraia.jpg' },
-  { id: 'praia-da-rocha',     namePT: 'Praia da Rocha',     nameEN: 'Praia da Rocha',     town: 'Portim\u00e3o', region: 'algarve', lat: 37.1167, lon: -8.5333, gh: 'gh-6', pop: 3, face: 180, cam: 'https://www.skylinewebcams.com/en/webcam/portugal/algarve/portimao/marina.html', photo: 'images/rocha.jpg' },
+  { id: 'meia-praia',         namePT: 'Meia Praia',         nameEN: 'Meia Praia',         town: 'Lagos',     region: 'algarve', lat: 37.1167, lon: -8.6833, gh: 'gh-5', pop: 1, face: 180, beachcam: 'https://www.beachcam.pt/livecams/meia-praia/', photo: 'images/meiapraia.jpg' },
+  { id: 'praia-da-rocha',     namePT: 'Praia da Rocha',     nameEN: 'Praia da Rocha',     town: 'Portim\u00e3o', region: 'algarve', lat: 37.1167, lon: -8.5333, gh: 'gh-6', pop: 3, face: 180, beachcam: 'https://www.beachcam.pt/livecams/praia-da-rocha/', photo: 'images/rocha.jpg' },
   { id: 'praia-de-benagil',   namePT: 'Praia de Benagil',   nameEN: 'Praia de Benagil',   town: 'Lagoa',     region: 'algarve', lat: 37.0833, lon: -8.4167, gh: 'gh-7', pop: 3, face: 180, photo: 'images/benagil.jpg' },
   { id: 'praia-da-marinha',   namePT: 'Praia da Marinha',   nameEN: 'Praia da Marinha',   town: 'Lagoa',     region: 'algarve', lat: 37.0833, lon: -8.4000, gh: 'gh-1', pop: 2, face: 180, photo: 'images/marinha.jpg' },
   { id: 'praia-do-camilo',    namePT: 'Praia do Camilo',    nameEN: 'Praia do Camilo',    town: 'Lagos',     region: 'algarve', lat: 37.0833, lon: -8.6667, gh: 'gh-2', pop: 2, face: 180, photo: 'images/camilo.jpg' },
@@ -1094,19 +1094,11 @@ function windyUrl(beach) {
 
 /* Helper: returns HTML for the 📷 camera button */
 function camBtnHTML(beach, t) {
-  // Skylinewebcams → plain link, opens in new tab (avoids X-Frame-Options)
-  if (beach.cam) {
-    return `<a class="cam-btn cam-btn--camera" href="${beach.cam}" target="_blank" rel="noopener noreferrer" title="${t.camTitle}">&#128247; ${t.camBtn2}</a>`;
-  }
-  // Beachcam.pt → plain link, opens in new tab
-  if (beach.beachcam) {
-    return `<a class="cam-btn cam-btn--camera" href="${beach.beachcam}" target="_blank" rel="noopener noreferrer" title="${t.camTitle}">&#128247; ${t.camBtn2}</a>`;
-  }
-  // Windy embed URL → modal iframe
-  if (beach.windyCamUrl) {
+  // Qualquer câmera → abre modal interno na app
+  if (beach.cam || beach.beachcam || beach.windyCamUrl) {
     return `<button class="cam-btn cam-btn--camera" onclick="openCamera('${beach.id}')" title="${t.camTitle}">&#128247; ${t.camBtn2}</button>`;
   }
-  // No camera → disabled
+  // Sem câmera → desativado
   return `<button class="cam-btn cam-btn--disabled" disabled title="${t.camUnavailable}">&#128247; ${t.camBtn2}</button>`;
 }
 
@@ -1153,11 +1145,13 @@ function openWindy(beachId) {
   openModal(windyUrl(beach), lang === 'PT' ? beach.namePT : beach.nameEN);
 }
 
-/* Botão 📷 — Windy webcam embed */
+/* Botão 📷 — abre câmera em modal interno (beachcam ou windy) */
 function openCamera(beachId) {
   const beach = BEACHES.find(b => b.id === beachId);
-  if (!beach || !beach.windyCamUrl) return;
-  openModal(beach.windyCamUrl, lang === 'PT' ? beach.namePT : beach.nameEN);
+  if (!beach) return;
+  const url = beach.beachcam || beach.cam || beach.windyCamUrl;
+  if (!url) return;
+  openModal(url, lang === 'PT' ? beach.namePT : beach.nameEN);
 }
 
 function closeCam() {
